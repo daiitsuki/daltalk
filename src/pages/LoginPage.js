@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { signInAnonymously } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -30,81 +29,29 @@ function LoginPage() {
   };
 
   return (
-    <Container>
-      <Title>TalkTalk</Title>
-      <LoginForm onSubmit={handleLogin}>
-        <NicknameInput
+    <div className="flex flex-col items-center justify-center w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+      <h1 className="text-4xl text-[#6f42c1] mb-8">TalkTalk</h1>
+      <form onSubmit={handleLogin} className="flex flex-col w-full">
+        <input
           type="text"
           placeholder="프로필 명을 입력하세요"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
+          className="p-3 text-base border border-gray-300 rounded mb-4"
         />
-        <PasswordInput
+        <input
           type="password"
           placeholder="패스워드를 입력하세요"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="p-3 text-base border border-gray-300 rounded mb-4"
         />
-        <LoginButton type="submit">채팅방 입장</LoginButton>
-      </LoginForm>
-    </Container>
+        <button type="submit" className="p-3 text-base text-white bg-[#6f42c1] border-none rounded cursor-pointer transition-colors duration-200 hover:bg-[#5a32a3]">
+          채팅방 입장
+        </button>
+      </form>
+    </div>
   );
 }
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  color: #6f42c1;
-  margin-bottom: 2rem;
-`;
-
-const LoginForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-
-const NicknameInput = styled.input`
-  padding: 0.8rem;
-  font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-`;
-
-const PasswordInput = styled.input`
-  padding: 0.8rem;
-  font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-`;
-
-const LoginButton = styled.button`
-  padding: 0.8rem;
-  font-size: 1rem;
-  color: #ffffff;
-  background-color: #6f42c1;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #5a32a3;
-  }
-`;
 
 export default LoginPage;

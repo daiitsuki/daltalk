@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState } from 'react';
 
 function Message({ msg, isme, formatTimestamp, onDelete, onLike }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -12,125 +11,75 @@ function Message({ msg, isme, formatTimestamp, onDelete, onLike }) {
   };
 
   return (
-    <MessageContainer isme={isme}>
-      {!isme && <Nickname>{msg.displayName}</Nickname>}
+    <div className={`flex flex-col ${isme ? 'items-end' : 'items-start'}`}>
+      {!isme && (
+        <span className="mb-0.5 text-xs text-gray-600">{msg.displayName}</span>
+      )}
       {msg.imageUrl && (
-        <MessageImage
+        <img
           src={msg.imageUrl}
-          alt="message image"
+          alt=""
           onClick={() => setModalOpen(true)}
+          className="mb-2 max-h-[200px] max-w-[200px] cursor-pointer rounded-lg"
         />
       )}
-      <TextContainer>
+      <div className="flex items-end gap-2">
         {isme ? (
           <>
-            <DeleteButton
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(msg.id);
               }}
+              className="mr-1 cursor-pointer border-none bg-transparent text-xs text-gray-500"
             >
               삭제
-            </DeleteButton>
-            <LikeButton liked={msg.liked}>{msg.liked && "❤️"}</LikeButton>
-            <Timestamp>{formatTimestamp(msg.createdAt)}</Timestamp>
-            <Text isme={isme}>{msg.text}</Text>
+            </button>
+            <button
+              className={`cursor-pointer border-none bg-transparent p-0 text-base leading-none ${
+                msg.liked ? 'text-red-500' : 'text-gray-300'
+              }`}
+            >
+              {msg.liked && '❤️'}
+            </button>
+            <span className="text-xs text-gray-600">
+              {formatTimestamp(msg.createdAt)}
+            </span>
+            <p className="m-0 max-w-full break-words rounded-2xl bg-[#6f42c1] px-4 py-2 text-white">
+              {msg.text}
+            </p>
           </>
         ) : (
           <>
-            <Text isme={isme} onClick={handleLikeClick}>
+            <p
+              className="m-0 max-w-full break-words rounded-2xl bg-white px-4 py-2 text-gray-800"
+              onClick={handleLikeClick}
+            >
               {msg.text}
-            </Text>
-            <Timestamp>{formatTimestamp(msg.createdAt)}</Timestamp>
-            <LikeButton liked={msg.liked}>{msg.liked && "❤️"}</LikeButton>
+            </p>
+            <span className="text-xs text-gray-600">
+              {formatTimestamp(msg.createdAt)}
+            </span>
+            <button
+              className={`cursor-pointer border-none bg-transparent p-0 text-base leading-none ${
+                msg.liked ? 'text-red-500' : 'text-gray-300'
+              }`}
+            >
+              {msg.liked && '❤️'}
+            </button>
           </>
         )}
-      </TextContainer>
+      </div>
       {modalOpen && (
-        <Modal onClick={() => setModalOpen(false)}>
-          <ModalContent src={msg.imageUrl} />
-        </Modal>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
+          onClick={() => setModalOpen(false)}
+        >
+          <img src={msg.imageUrl} className="max-h-[90%] max-w-[90%]" alt="" />
+        </div>
       )}
-    </MessageContainer>
+    </div>
   );
 }
-
-const MessageImage = styled.img`
-  max-width: 200px;
-  max-height: 200px;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-bottom: 0.5rem;
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.img`
-  max-width: 90%;
-  max-height: 90%;
-`;
-
-const MessageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: ${(props) => (props.isme ? "flex-end" : "flex-start")};
-`;
-
-const Nickname = styled.span`
-  font-size: 0.8rem;
-  color: #555;
-  margin-bottom: 0.2rem;
-`;
-
-const TextContainer = styled.div`
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-`;
-
-const DeleteButton = styled.button`
-  background: transparent;
-  border: none;
-  color: #999;
-  cursor: pointer;
-  font-size: 0.7rem;
-  margin-right: 5px;
-`;
-
-const Text = styled.p`
-  margin: 0;
-  padding: 0.7rem 1rem;
-  background-color: ${(props) => (props.isme ? "#6f42c1" : "#ffffff")};
-  color: ${(props) => (props.isme ? "white" : "#333")};
-  border-radius: 15px;
-  max-width: 100%;
-  word-break: break-word;
-`;
-
-const Timestamp = styled.span`
-  font-size: 0.7rem;
-  color: #888;
-`;
-
-const LikeButton = styled.button`
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  color: ${(props) => (props.liked ? "#ff4b5c" : "#ccc")};
-  padding: 0;
-  line-height: 1;
-`;
 
 export default Message;
