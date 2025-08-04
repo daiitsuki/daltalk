@@ -5,6 +5,7 @@ function MessageForm({ newMessage, setNewMessage, handleSendMessage }) {
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [isSending, setIsSending] = useState(false);
 
   const handleChange = (e) => {
     const file = e.target.files?.[0];
@@ -22,18 +23,34 @@ function MessageForm({ newMessage, setNewMessage, handleSendMessage }) {
   const handleCancelImage = () => {
     setSelectedFile(null);
     setPreviewUrl(null);
-    fileInputRef.current.value = null;
+    if(fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
   };
 
   const handleIconClick = () => {
-    fileInputRef.current.click();
+    if(fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    handleSendMessage(selectedFile);
-    setSelectedFile(null);
-    setPreviewUrl(null);
+    if (isSending) return;
+
+    setIsSending(true);
+    try {
+      await handleSendMessage(selectedFile);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      if(fileInputRef.current) {
+        fileInputRef.current.value = null;
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -44,22 +61,22 @@ function MessageForm({ newMessage, setNewMessage, handleSendMessage }) {
         accept="image/*"
         onChange={handleChange}
         className="hidden"
+        disabled={isSending}
       ></input>
       <div className="relative">
         <button
           type="button"
           onClick={handleIconClick}
-          className="flex cursor-pointer items-center rounded border-none bg-[#6f42c1] p-3 text-base text-white"
+          className={`flex cursor-pointer items-center rounded border-none bg-[#6f42c1] p-3 text-base text-white ${
+            isSending ? 'cursor-not-allowed opacity-50' : ''
+          }`}
+          disabled={isSending}
         >
           <SlPicture size={24} />
         </button>
         {previewUrl && (
-          <div className="absolute bottom-full left-1/2 mb-4 inline-block -translate-x-1/2 rounded-lg bg-white p-2 shadow-lg after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-8 after:border-solid after:border-white after:border-b-transparent after:border-l-transparent after:border-r-transparent after:border-t-white after:content-['']">
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="max-h-24 w-auto rounded"
-            />
+          <div className="absolute bottom-full left-12 z-10 mb-4 inline-block w-32 -translate-x-1/2 rounded-lg bg-white p-2 shadow-lg after:absolute after:left-1/2 after:top-full after:-translate-x-1/2 after:border-8 after:border-solid after:border-white after:border-b-transparent after:border-l-transparent after:border-r-transparent after:border-t-white after:content-['']">
+            <img src={previewUrl} alt="Preview" className="max-h-48 rounded" />
             <button
               type="button"
               onClick={handleCancelImage}
@@ -75,13 +92,17 @@ function MessageForm({ newMessage, setNewMessage, handleSendMessage }) {
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
         placeholder="메시지를 입력하세요..."
-        className="flex-1 rounded border border-gray-300 p-3 text-base"
+        className="flex-1 rounded border border-gray-300 p-3 text-base min-w-0"
+        disabled={isSending}
       />
       <button
         type="submit"
-        className="cursor-pointer rounded border-none bg-[#6f42c1] p-3 px-5 text-base text-white"
+        className={`cursor-pointer rounded border-none bg-[#6f42c1] p-3 px-5 text-base text-white ${
+          isSending ? 'cursor-not-allowed opacity-50' : ''
+        }`}
+        disabled={isSending}
       >
-        전송
+        {isSending ? '전송 중...' : '전송'}
       </button>
     </form>
   );

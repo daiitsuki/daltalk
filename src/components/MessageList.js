@@ -13,7 +13,7 @@ function MessageList({
 
   return (
     <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-4">
-      {messages.map((msg) => {
+      {messages.map((msg, index) => {
         let dateSeparator = null;
 
         if (msg.createdAt && typeof msg.createdAt.toDate === 'function') {
@@ -30,6 +30,17 @@ function MessageList({
           }
         }
 
+        const prevMsg = messages[index - 1];
+        const nextMsg = messages[index + 1];
+
+        const shouldShowTimestamp =
+          !nextMsg ||
+          nextMsg.uid !== msg.uid ||
+          formatTimestamp(nextMsg.createdAt) !== formatTimestamp(msg.createdAt);
+
+        const shouldShowDisplayName =
+          !prevMsg || prevMsg.uid !== msg.uid || !!dateSeparator;
+
         return (
           <React.Fragment key={msg.id}>
             {dateSeparator}
@@ -39,6 +50,8 @@ function MessageList({
               formatTimestamp={formatTimestamp}
               onDelete={onDelete}
               onLike={onLike}
+              shouldShowTimestamp={shouldShowTimestamp}
+              shouldShowDisplayName={shouldShowDisplayName}
             />
           </React.Fragment>
         );

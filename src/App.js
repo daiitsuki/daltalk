@@ -9,13 +9,18 @@ import LoginPage from './pages/LoginPage';
 import ChatPage from './pages/ChatPage';
 import { getToken } from 'firebase/messaging';
 import { db, auth, messaging } from './firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { listenForMessages } from './firebaseMessaging';
 
 function AppContent() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const savedFont = localStorage.getItem('font') || 'sans-serif';
+    document.body.style.fontFamily = savedFont;
+  }, []);
 
   useEffect(() => {
     listenForMessages((payload) => {
@@ -53,10 +58,20 @@ function AppContent() {
             });
 
             if (currentToken) {
-              console.log('✅ FCM Token:', currentToken);
-              await setDoc(doc(db, 'fcmTokens', user.uid), {
-                token: currentToken,
-              });
+              const docRef = doc(db, 'fcmTokens', user.uid);
+              const docSnap = await getDoc(docRef);
+              const storedToken = docSnap.exists()
+                ? docSnap.data().token
+                : null;
+
+              if (storedToken !== currentToken) {
+                console.log(
+                  '📌 FCM 토큰이 변경되어 Firestore에 업데이트합니다.',
+                );
+                await setDoc(docRef, { token: currentToken });
+              } else {
+                console.log('✅ 기존 FCM 토큰과 동일합니다. 업데이트 생략.');
+              }
             } else {
               console.warn('🚫 FCM 토큰이 생성되지 않았습니다.');
             }
@@ -80,7 +95,7 @@ function AppContent() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-100 font-sans">
+    <div className="flex h-screen items-center justify-center bg-gray-100">
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/chat" element={<ChatPage />} />

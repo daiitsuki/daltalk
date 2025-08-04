@@ -9,21 +9,21 @@ export const resizeImage = (file, scale = 0.25) => {
     };
 
     img.onload = () => {
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return reject("Canvas context 생성 실패");
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject('Canvas context 생성 실패');
 
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       canvas.toBlob(
         (blob) => {
           if (blob) resolve(blob);
-          else reject("Blob 생성 실패");
+          else reject('Blob 생성 실패');
         },
-        "image/jpeg",
-        0.8
+        'image/jpeg',
+        0.8,
       ); // JPEG, 품질 0.8
     };
 
